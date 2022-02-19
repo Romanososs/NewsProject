@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,6 +13,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.newsproject.R
 import com.example.newsproject.databinding.FragmentCategoryListBinding
+import com.example.newsproject.ui.FragmentState
 import com.example.newsproject.ui.ItemClickListener
 import com.example.newsproject.ui.categoryList.recycler.CategoryListAdapter
 import com.example.newsproject.ui.categoryList.recycler.CategoryListDecorator
@@ -57,6 +60,20 @@ class CategoryListFragment :
         viewModel.navEvent.observe(viewLifecycleOwner) {
             Log.d(TAG, "NavEvent was called")
             binding.root.findNavController().navigate(it)
+        }
+        viewModel.state.observe(viewLifecycleOwner) {
+            Log.d(TAG, "state was changed to $it")
+            binding.layout.visibility = GONE
+            binding.stateLoading.stateLoading.visibility = GONE
+            binding.stateFailed.stateFailed.visibility = GONE
+            when (it) {
+                FragmentState.isReady -> binding.layout.visibility = VISIBLE
+                FragmentState.isFailed -> {
+                    binding.stateFailed.stateFailed.visibility = VISIBLE
+                    binding.stateFailed.errorMessage.text = viewModel.errorMessage.value
+                }
+                else -> binding.stateLoading.stateLoading.visibility = VISIBLE
+            }
         }
         return binding.root
     }

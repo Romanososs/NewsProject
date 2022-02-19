@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.newsproject.R
 import com.example.newsproject.databinding.FragmentNewsListBinding
+import com.example.newsproject.ui.FragmentState
 import com.example.newsproject.ui.ItemClickListener
 import com.example.newsproject.ui.newsList.recycler.NewsListAdapter
 import com.example.newsproject.ui.newsList.recycler.NewsListDecorator
@@ -60,7 +63,7 @@ class NewsListFragment :
             */
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState);
+                    super.onScrollStateChanged(recyclerView, newState)
                     if (!recyclerView.canScrollVertically(1)) {
                         viewModel.getNewPage()
                     }
@@ -74,6 +77,20 @@ class NewsListFragment :
         viewModel.navEvent.observe(viewLifecycleOwner) {
             Log.d(TAG, "NavEvent was called")
             binding.root.findNavController().navigate(it)
+        }
+        viewModel.state.observe(viewLifecycleOwner) {
+            Log.d(TAG, "state was changed to $it")
+            binding.layout.visibility = View.GONE
+            binding.stateLoading.stateLoading.visibility = GONE
+            binding.stateFailed.stateFailed.visibility = GONE
+            when (it) {
+                FragmentState.isReady -> binding.layout.visibility = VISIBLE
+                FragmentState.isFailed -> {
+                    binding.stateFailed.stateFailed.visibility = VISIBLE
+                    binding.stateFailed.errorMessage.text = viewModel.errorMessage.value
+                }
+                else -> binding.stateLoading.stateLoading.visibility = VISIBLE
+            }
         }
         return binding.root
     }

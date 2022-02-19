@@ -3,42 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.news.NewsFragment">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/news_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/content_margin"
-        android:layout_marginTop="@dimen/content_margin"
-        android:text="text"
-        android:textColor="@color/black"
-        android:textSize="@dimen/title_text_size"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include
+        android:id="@+id/state_failed"
+        layout="@layout/state_failed"
+        android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/news_shortDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/content_margin"
-        android:layout_marginTop="@dimen/content_margin_half"
-        android:text="text"
-        android:textSize="@dimen/main_content_text_size"
-        app:layout_constraintEnd_toEndOf="@+id/news_title"
-        app:layout_constraintStart_toStartOf="@+id/news_title"
-        app:layout_constraintTop_toBottomOf="@id/news_title" />
+    <include
+        android:id="@+id/state_loading"
+        layout="@layout/state_loading"/>
 
-    <WebView
-        android:id="@+id/news_page"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/content_margin_half"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/news_shortDescription"
-        app:layout_constraintStart_toStartOf="@+id/news_shortDescription"
-        app:layout_constraintTop_toBottomOf="@id/news_shortDescription"
-        app:layout_constraintVertical_bias="0.0" />
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:context=".ui.news.NewsFragment">
+
+        <TextView
+            android:id="@+id/news_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/content_margin"
+            android:layout_marginTop="@dimen/content_margin"
+            android:textColor="@color/black"
+            android:textSize="@dimen/title_text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/news_shortDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/content_margin"
+            android:layout_marginTop="@dimen/content_margin_half"
+            android:textSize="@dimen/main_content_text_size"
+            app:layout_constraintEnd_toEndOf="@+id/news_title"
+            app:layout_constraintStart_toStartOf="@+id/news_title"
+            app:layout_constraintTop_toBottomOf="@id/news_title" />
+
+        <WebView
+            android:id="@+id/news_page"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/content_margin_half"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/news_shortDescription"
+            app:layout_constraintStart_toStartOf="@+id/news_shortDescription"
+            app:layout_constraintTop_toBottomOf="@id/news_shortDescription"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import androidx.navigation.NavDirections
 import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.Category
 import com.example.newsproject.data.NewsRepository
+import com.example.newsproject.ui.FragmentState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -19,17 +20,22 @@ class CategoryListViewModelImpl @Inject constructor(
     private val TAG = "MyCategoryListViewModel"
     override val list: MutableLiveData<List<Category>> = MutableLiveData()
     override val navEvent: SingleLiveEvent<NavDirections> = SingleLiveEvent()
+    override val state: MutableLiveData<FragmentState> = MutableLiveData()
+    override val errorMessage: MutableLiveData<String> = MutableLiveData()
 
     init {
         Log.d(TAG, "was initialized")
+        state.value = FragmentState.isLoading
         repository.getCategoryList(
             onSuccess = {
                 Log.d(TAG, "getCategoryList onSuccess called")
                 list.value = it
+                state.value = FragmentState.isReady
             },
             onFailure = {
                 Log.d(TAG, "getCategoryList onFailure called")
-                //TODO not yet impl
+                errorMessage.value = it
+                state.value = FragmentState.isFailed
             }
         )
 

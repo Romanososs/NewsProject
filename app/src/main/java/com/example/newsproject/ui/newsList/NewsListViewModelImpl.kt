@@ -8,25 +8,30 @@ import androidx.navigation.NavDirections
 import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
+import com.example.newsproject.ui.FragmentState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsListViewModelImpl @Inject constructor(
     private val repository: NewsRepository,
-    private val state: SavedStateHandle
+    private val savedState: SavedStateHandle
 ) : ViewModel(),
     NewsListViewModel {
     private val TAG = "MyNewsListViewModel"
 
     override val list: MutableLiveData<MutableList<News>> = MutableLiveData()
     override val navEvent: SingleLiveEvent<NavDirections> = SingleLiveEvent()
-    private val categoryId = state.get<Long>("categoryId") ?: -1
+    override val state: MutableLiveData<FragmentState> = MutableLiveData()
+    override val errorMessage: MutableLiveData<String> = MutableLiveData()
+
+    private val categoryId = savedState.get<Long>("categoryId") ?: -1
     //if nextPage == null -> last page loading returned empty list aka it's the last page
     private var nextPage: Int? = 0
 
     init {
         Log.d(TAG, "was initialized")
+        state.value = FragmentState.isLoading
     }
 
     override fun onCreateView() {
@@ -35,7 +40,7 @@ class NewsListViewModelImpl @Inject constructor(
     }
 
     /*
-        Load next page, viewModel pae count will be increased by 1
+        Load next page, viewModel page count will be increased by 1
         Call it from Fragment, when user scrolled to the end of the recycler
      */
     override fun getNewPage() {
@@ -48,15 +53,16 @@ class NewsListViewModelImpl @Inject constructor(
                     if (it.isNotEmpty()) {
                         val array = list.value ?: mutableListOf()
                         array.addAll(it)
-                        //only setValue triggers callback
                         list.value = array
                         nextPage = nextPage!! + 1
                     } else
                         nextPage = null
+                    state.value = FragmentState.isReady
                 },
                 onFailure = {
                     Log.d(TAG, "getNewsList onFailure called")
-                    //TODO not yet impl
+                    errorMessage.value = it
+                    state.value = FragmentState.isFailed
                 }
             )
         }

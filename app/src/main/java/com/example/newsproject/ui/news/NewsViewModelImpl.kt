@@ -6,21 +6,26 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
+import com.example.newsproject.ui.FragmentState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class NewsViewModelImpl @Inject constructor(
     private val repository: NewsRepository,
-    private val state: SavedStateHandle
+    private val savedState: SavedStateHandle
 ) : ViewModel(),
     NewsViewModel {
     private val TAG = "MyNewsViewModel"
     override val news: MutableLiveData<News> = MutableLiveData()
-    val newsId = state.get<Long>("newsId") ?: -1
+    override val state: MutableLiveData<FragmentState> = MutableLiveData()
+    override val errorMessage: MutableLiveData<String> = MutableLiveData()
+
+    private val newsId = savedState.get<Long>("newsId") ?: -1
 
     init {
         Log.d(TAG, "was initialized")
+        state.value = FragmentState.isLoading
         repository.getNews(
             newsId,
             onSuccess = {
@@ -30,10 +35,12 @@ class NewsViewModelImpl @Inject constructor(
             onPartialSuccess = {
                 Log.d(TAG, "getNews onPartialSuccess called")
                 news.value = it
+                state.value = FragmentState.isReady
             },
             onFailure = {
                 Log.d(TAG, "getNews onFailure called")
-                //TODO not yet impl
+                errorMessage.value = it
+                state.value = FragmentState.isFailed
             }
         )
     }
