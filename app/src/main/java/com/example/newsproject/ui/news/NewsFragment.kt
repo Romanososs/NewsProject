@@ -39,7 +39,7 @@ class NewsFragment : Fragment() {
         }
         viewModel.state.observe(viewLifecycleOwner) {
             Log.d(TAG, "state was changed to $it")
-            binding.layout.visibility = View.GONE
+            binding.layout.visibility = GONE
             binding.stateLoading.stateLoading.visibility = GONE
             binding.stateFailed.stateFailed.visibility = GONE
             when (it) {

@@ -13,32 +13,26 @@ import com.example.newsproject.ui.newsList.NewsListViewModelImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.assisted.Assisted
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
 import javax.inject.Singleton
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppBindModule {
-    @Singleton
-    @Binds
-    abstract fun bindNewsRemoteDataSource(
-        impl: NewsRemoteDataSourceImpl
-    ): NewsRemoteDataSource
-
-}
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppProvideModule {
     @Singleton
     @Provides
-    fun provideNewsRepositoryImpl(
+    fun provideNewsRepository(
         remoteDS: NewsRemoteDataSource
-    ): NewsRepository = NewsRepositoryImpl(remoteDS)
+    ): NewsRepository = NewsRepositoryImpl(remoteDS, Default)
+
+    @Singleton
+    @Provides
+    fun provideNewsRemoteDataSource(
+    ): NewsRemoteDataSource = NewsRemoteDataSourceImpl(IO)
 }
 
 @Module

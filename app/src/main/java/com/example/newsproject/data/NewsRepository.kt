@@ -1,21 +1,18 @@
 package com.example.newsproject.data
 
 interface NewsRepository {
-    fun getCategoryList(
-        onSuccess: (List<Category>) -> Unit,
-        onFailure: (String) -> Unit
-    )
+    suspend fun getCategoryList(): List<Category>
 
-    fun getNewsList(
+    suspend fun getNewsList(
         categoryId: Long,
-        page: Int,
-        onSuccess: (List<News>) -> Unit,
-        onFailure: (String) -> Unit
-    )
-    fun getNews(
-        newsId: Long,
-        onSuccess: (News) -> Unit,
-        onPartialSuccess: (News) -> Unit,
-        onFailure: (String) -> Unit
-    )
+        page: Int
+    ): List<News>
+
+    suspend fun getQuickNews(
+        newsId: Long
+    ): News
+
+    suspend fun getNews(
+        newsId: Long
+    ): News
 }
