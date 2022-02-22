@@ -18,7 +18,7 @@ import com.example.newsproject.data.News
 import java.text.SimpleDateFormat
 
 @Composable
-fun NewsListScreen(
+fun NewsScreen(
     viewModel: NewsViewModel
 ) {
     // Livedata to State
