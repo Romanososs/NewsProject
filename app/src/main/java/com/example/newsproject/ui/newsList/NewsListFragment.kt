@@ -44,8 +44,9 @@ class NewsListFragment :
         Log.d(TAG, "onCreateView called")
         return ComposeView(requireContext()).apply {
             setContent {
-                //CategoryListScreen(viewModel = viewModel)
+                NewsListScreen(viewModel = viewModel)
             }
+            viewModel.getNewPage()
         }
 //        _binding = FragmentNewsListBinding.inflate(inflater, container, false)
 //        viewModel.onCreateView()

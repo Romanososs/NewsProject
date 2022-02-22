@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@id/categoryListFragment">
+    app:startDestination="@id/newsListFragment">
 
     <fragment
         android:id="@+id/categoryListFragment"
@@ -30,7 +30,8 @@
         tools:layout="@layout/fragment_news_list">
         <argument
             android:name="categoryId"
-            app:argType="long" />
+            app:argType="long"
+            android:defaultValue="0L" />
         <action
             android:id="@+id/action_newsListFragment_to_newsFragment"
             app:destination="@id/newsFragment"
@@ -50,7 +51,8 @@
         tools:layout="@layout/fragment_news">
         <argument
             android:name="newsId"
-            app:argType="long" />
+            app:argType="long"
+            android:defaultValue="3L" />
     </fragment>
 
 </navigation>
