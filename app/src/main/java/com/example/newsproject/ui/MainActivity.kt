@@ -1,10 +1,10 @@
-package com.example.newsproject
+package com.example.newsproject.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import com.example.newsproject.R
 import com.example.newsproject.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 

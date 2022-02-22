@@ -1,10 +1,8 @@
-package com.example.newsproject.ui.categoryList.widget
+package com.example.newsproject.ui.categoryList
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +19,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.newsproject.data.Category
-import com.example.newsproject.ui.categoryList.CategoryListViewModel
 
 @Composable
 fun CategoryListScreen(
@@ -41,7 +38,6 @@ fun CategoryListList(
     list: List<Category>,
     onItemClick: (category: Category) -> Unit
 ) {
-
     LazyVerticalGrid(
         cells = GridCells.Adaptive(150.dp), //mb put this values into res or something
         contentPadding = PaddingValues(16.dp),

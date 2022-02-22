@@ -1,7 +1,6 @@
-package com.example.newsproject.ui.categoryList.widget
+package com.example.newsproject.ui.newsList
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,15 +20,17 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.newsproject.data.Category
+import com.example.newsproject.data.News
 import com.example.newsproject.ui.categoryList.CategoryListViewModel
+import java.text.SimpleDateFormat
 
 @Composable
-fun CategoryListScreen(
-    viewModel: CategoryListViewModel
+fun NewsListScreen(
+    viewModel: NewsListViewModel
 ) {
     // Livedata to State
-    val items: List<Category> by viewModel.list.observeAsState(listOf())
-    CategoryListList(
+    val items: List<News> by viewModel.list.observeAsState(listOf())
+    NewsListList(
         list = items,
         onItemClick = { viewModel.onItemClicked(it.id) } //TODO Replace with navigate
     )
@@ -37,36 +38,47 @@ fun CategoryListScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CategoryListList(
-    list: List<Category>,
-    onItemClick: (category: Category) -> Unit
+fun NewsListList(
+    list: List<News>,
+    onItemClick: (item: News) -> Unit
 ) {
-
-    LazyVerticalGrid(
-        cells = GridCells.Adaptive(150.dp), //mb put this values into res or something
+    LazyColumn(
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(list) { category ->
-            CategoryListItem(category, onItemClick)
+        items(list) { news ->
+            NewsListItem(news, onItemClick)
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CategoryListItem(category: Category, onClick: (category: Category) -> Unit) {
+fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
     Card(
         shape = RoundedCornerShape(5.dp),
         backgroundColor = MaterialTheme.colors.surface, //TODO check mb redo
-        onClick = { onClick(category) },
-        modifier = Modifier
-            .height(85.dp)
+        onClick = { onClick(news) }//TODO add
     ) {
-        Text(
-            text = category.name,
+        Text(//TODO overFlow doesn't work
+            text = news.title,
             style = TextStyle(fontSize = 20.sp),
+            maxLines = 2,
+            modifier = Modifier
+                .padding(16.dp)
+                .wrapContentHeight(Alignment.CenterVertically)
+        )
+        Text(
+            text = SimpleDateFormat("dd.MM.yyyy HH:mm").format(news.date),
+            fontSize = 20.sp,
+            maxLines = 2,
+            modifier = Modifier
+                .padding(16.dp)
+                .wrapContentHeight(Alignment.CenterVertically)
+        )
+        Text(
+            text = news.shortDescription,
+            fontSize = 20.sp,
             maxLines = 2,
             modifier = Modifier
                 .padding(16.dp)
