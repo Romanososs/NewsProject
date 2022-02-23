@@ -81,5 +81,6 @@ data class News(
     val date: Date = Date.from(Instant.now()),
     val shortDescription: String = "",
     val fullDescription: String = "",
+    //true - have fullDescription, false - fullDescription is empty str
     var state: Boolean = false
 )

@@ -1,18 +1,17 @@
 package com.example.newsproject.data
 
-import retrofit2.Call
 import retrofit2.http.*
 
 interface RetrofitService {
     @GET("categories")
-    fun getCategoryList(): Call<ApiCategoryList>
+    suspend fun getCategoryList(): ApiCategoryList
 
     @GET("categories/{id}/news")
-    fun getNewsList(
+    suspend fun getNewsList(
         @Path("id") id: Long,
         @Query("page") page: Int
-    ): Call<ApiNewsList>
+    ): ApiNewsList
 
     @GET("details")
-    fun getNews(@Query("id") id: Long): Call<ApiNews>
+    suspend fun getNews(@Query("id") id: Long): ApiNews
 }

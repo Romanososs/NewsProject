@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
 import com.example.newsproject.ui.FragmentState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,30 +20,17 @@ class NewsViewModelImpl @Inject constructor(
     NewsViewModel {
     private val TAG = "MyNewsViewModel"
     override val news: MutableLiveData<News> = MutableLiveData()
-    override val state: MutableLiveData<FragmentState> = MutableLiveData()
-    override val errorMessage: MutableLiveData<String> = MutableLiveData()
+    override val state: MutableLiveData<FragmentState> = MutableLiveData(FragmentState.isLoading)
+    override val errorMessage: MutableLiveData<String> = MutableLiveData("")
 
     private val newsId = savedState.get<Long>("newsId") ?: -1
 
     init {
-        Log.d(TAG, "was initialized")
-        state.value = FragmentState.isLoading
-        repository.getNews(
-            newsId,
-            onSuccess = {
-                Log.d(TAG, "getNews onSuccess called")
-                news.value = it
-            },
-            onPartialSuccess = {
-                Log.d(TAG, "getNews onPartialSuccess called")
-                news.value = it
-                state.value = FragmentState.isReady
-            },
-            onFailure = {
-                Log.d(TAG, "getNews onFailure called")
-                errorMessage.value = it
-                state.value = FragmentState.isFailed
-            }
-        )
+        viewModelScope.launch {
+            Log.d(TAG, "was initialized")
+            news.value = repository.getQuickNews(newsId)
+            state.value = FragmentState.isReady
+            news.value = repository.getNews(newsId)
+        }
     }
 }
