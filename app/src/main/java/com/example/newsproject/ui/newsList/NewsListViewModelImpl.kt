@@ -9,11 +9,8 @@ import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
 import com.example.newsproject.ui.FragmentState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class NewsListViewModelImpl @Inject constructor(
+class NewsListViewModelImpl(
     private val repository: NewsRepository,
     private val savedState: SavedStateHandle
 ) : ViewModel(),
@@ -32,6 +29,7 @@ class NewsListViewModelImpl @Inject constructor(
     init {
         Log.d(TAG, "was initialized")
         state.value = FragmentState.isLoading
+        getNewPage()
     }
 
     override fun onCreateView() {

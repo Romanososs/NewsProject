@@ -1,9 +1,8 @@
 package com.example.newsproject.data;
 
 import android.util.Log
-import javax.inject.Inject
 
-class NewsRepositoryImpl @Inject constructor(
+class NewsRepositoryImpl(
     private val remoteDS: NewsRemoteDataSource
 ) : NewsRepository {
     private val TAG = "MyNewsRepository"

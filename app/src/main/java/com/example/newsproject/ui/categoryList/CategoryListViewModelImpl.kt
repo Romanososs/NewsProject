@@ -8,11 +8,8 @@ import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.Category
 import com.example.newsproject.data.NewsRepository
 import com.example.newsproject.ui.FragmentState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class CategoryListViewModelImpl @Inject constructor(
+class CategoryListViewModelImpl(
     private val repository: NewsRepository
 ) :
     ViewModel(),

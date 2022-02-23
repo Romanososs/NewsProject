@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 
-class NewsRemoteDataSourceImpl @Inject constructor() :
+class NewsRemoteDataSourceImpl:
     NewsRemoteDataSource{
     private val BASE_URL = "http://testtask.sebbia.com/v1/news/"
     private val TAG = "MyNewsRemoteDataSource"

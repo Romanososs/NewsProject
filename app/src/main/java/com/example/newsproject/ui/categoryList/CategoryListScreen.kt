@@ -1,5 +1,7 @@
 package com.example.newsproject.ui.categoryList
 
+import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -18,21 +20,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.newsproject.data.Category
+import com.example.newsproject.ui.Screen
+import org.koin.androidx.compose.getStateViewModel
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.viewModel
 
+
+@ExperimentalMaterialApi
+@ExperimentalFoundationApi
 @Composable
-fun CategoryListScreen(
-    viewModel: CategoryListViewModel
-) {
+fun CategoryListScreen(navigateToNewsList: (id: Long) -> Unit) {
+    val viewModel: CategoryListViewModel = getViewModel<CategoryListViewModelImpl>()
     // Livedata to State
     val items: List<Category> by viewModel.list.observeAsState(listOf())
     CategoryListList(
         list = items,
-        onItemClick = { viewModel.onItemClicked(it.id) } //TODO Replace with navigate
+        onItemClick = {
+            navigateToNewsList(it.id)
+        }
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
+@ExperimentalFoundationApi
+@ExperimentalMaterialApi
 @Composable
 fun CategoryListList(
     list: List<Category>,
@@ -50,7 +63,7 @@ fun CategoryListList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@ExperimentalMaterialApi
 @Composable
 fun CategoryListItem(category: Category, onClick: (category: Category) -> Unit) {
     Card(

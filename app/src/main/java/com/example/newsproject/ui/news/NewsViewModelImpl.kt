@@ -7,11 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
 import com.example.newsproject.ui.FragmentState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
-@HiltViewModel
-class NewsViewModelImpl @Inject constructor(
+class NewsViewModelImpl(
     private val repository: NewsRepository,
     private val savedState: SavedStateHandle
 ) : ViewModel(),

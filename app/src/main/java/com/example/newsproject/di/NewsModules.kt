@@ -18,45 +18,58 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.dsl.module
 import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class AppBindModule {
-    @Singleton
-    @Binds
-    abstract fun bindNewsRemoteDataSource(
-        impl: NewsRemoteDataSourceImpl
-    ): NewsRemoteDataSource
+val NewsModule = module {
+    single<NewsRemoteDataSource> { NewsRemoteDataSourceImpl() }
+    single<NewsRepository> { NewsRepositoryImpl(get()) }
 
+    viewModel { CategoryListViewModelImpl(get()) }
+    viewModel { params ->
+        NewsListViewModelImpl(get(), params.get()) }
+    viewModel { NewsViewModelImpl(get(), get()) }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-class AppProvideModule {
-    @Singleton
-    @Provides
-    fun provideNewsRepositoryImpl(
-        remoteDS: NewsRemoteDataSource
-    ): NewsRepository = NewsRepositoryImpl(remoteDS)
-}
 
-@Module
-@InstallIn(ViewModelComponent::class)
-abstract class ViewModelProvideModule {
-    @Binds
-    abstract fun bindCategoryListViewModelImpl(
-        impl: CategoryListViewModelImpl
-    ): CategoryListViewModel
-
-    @Binds
-    abstract fun bindNewsListViewModelImpl(
-        impl: NewsListViewModelImpl
-    ): NewsListViewModel
-
-    @Binds
-    abstract fun bindNewsViewModelImpl(
-        impl: NewsViewModelImpl
-    ): NewsViewModel
-
-}
+//@Module
+//@InstallIn(SingletonComponent::class)
+//abstract class AppBindModule {
+//    @Singleton
+//    @Binds
+//    abstract fun bindNewsRemoteDataSource(
+//        impl: NewsRemoteDataSourceImpl
+//    ): NewsRemoteDataSource
+//
+//}
+//
+//@Module
+//@InstallIn(SingletonComponent::class)
+//class AppProvideModule {
+//    @Singleton
+//    @Provides
+//    fun provideNewsRepositoryImpl(
+//        remoteDS: NewsRemoteDataSource
+//    ): NewsRepository = NewsRepositoryImpl(remoteDS)
+//}
+//
+//@Module
+//@InstallIn(ViewModelComponent::class)
+//abstract class ViewModelProvideModule {
+//    @Binds
+//    abstract fun bindCategoryListViewModelImpl(
+//        impl: CategoryListViewModelImpl
+//    ): CategoryListViewModel
+//
+//    @Binds
+//    abstract fun bindNewsListViewModelImpl(
+//        impl: NewsListViewModelImpl
+//    ): NewsListViewModel
+//
+//    @Binds
+//    abstract fun bindNewsViewModelImpl(
+//        impl: NewsViewModelImpl
+//    ): NewsViewModel
+//
+//}
