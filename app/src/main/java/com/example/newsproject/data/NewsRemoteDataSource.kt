@@ -1,16 +1,15 @@
 package com.example.newsproject.data
 
 interface NewsRemoteDataSource {
-    fun getCategoryList(callback: (Result<ApiCategoryList?>) -> Unit)
 
-    fun getNewsList(
+    suspend fun getCategoryList(): ApiCategoryList
+
+    suspend fun getNewsList(
         categoryId: Long,
-        page: Int,
-        callback: (Result<ApiNewsList?>) -> Unit
-    )
+        page: Int
+    ): ApiNewsList
 
-    fun getNews(
-        newsId: Long,
-        callback: (Result<ApiNews?>) -> Unit
-    )
+    suspend fun getNews(
+        newsId: Long
+    ): ApiNews
 }

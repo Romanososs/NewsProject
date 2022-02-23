@@ -18,13 +18,16 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.IO
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import javax.inject.Singleton
 
 val NewsModule = module {
-    single<NewsRemoteDataSource> { NewsRemoteDataSourceImpl() }
-    single<NewsRepository> { NewsRepositoryImpl(get()) }
+    single<NewsRemoteDataSource> { NewsRemoteDataSourceImpl(IO) }
+    single<NewsRepository> { NewsRepositoryImpl(get(), Default) }
 
     viewModel { CategoryListViewModelImpl(get()) }
     viewModel { params ->

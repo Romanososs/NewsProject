@@ -1,130 +1,91 @@
 package com.example.newsproject.data;
 
 import android.util.Log
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
-class NewsRepositoryImpl(
-    private val remoteDS: NewsRemoteDataSource
+class NewsRepositoryImpl (
+    private val remoteDS: NewsRemoteDataSource,
+    private val dispatcher: CoroutineDispatcher
 ) : NewsRepository {
     private val TAG = "MyNewsRepository"
 
+    private val cacheMutex = Mutex()
     private var cache: NewsCache = NewsCache()
 
-    override fun getCategoryList(
-        onSuccess: (List<Category>) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
+    override suspend fun getCategoryList(): List<Category> {
         Log.d(TAG, "getCategoryList was called")
-        if (cache.categoryList.isNotEmpty()) {
-            onSuccess(cache.categoryList)
-        } else {
-            remoteDS.getCategoryList { result ->
-                result
-                    .onSuccess {
-                        Log.d(TAG, "getCategoryList onSuccess called")
-                        if (it != null) {
-                            if (it.code == 0) {
-                                cache.categoryList = it.list
-                                onSuccess(it.list)
-                            } else {
-                                Log.i(TAG, it.message)
-                                onFailure(it.message)
-                            }
-                        } else {
-                            Log.i(TAG, "categoryList == null error")
-                            onFailure("Undefined error")
+        return cache.categoryList.ifEmpty {
+            withContext(dispatcher) {
+                remoteDS.getCategoryList().also {
+                    if (it.code == 0) {
+                        cacheMutex.withLock {
+                            cache.categoryList = it.list
                         }
+                    } else {
+                        throw Throwable(it.message)
                     }
-                    .onFailure {
-                        Log.d(TAG, "getCategoryList onFailure called")
-                        Log.i(TAG, it.message ?: "Undefine error")
-                        onFailure(it.message ?: "Undefine error")
-                    }
+                }.list
             }
         }
     }
 
-    override fun getNewsList(
+    override suspend fun getNewsList(
         categoryId: Long,
-        page: Int,
-        onSuccess: (List<News>) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
+        page: Int
+    ): List<News> {
         Log.d(TAG, "getNewsList was called")
-        if (cache.containsNewsPage(categoryId, page)) {
-            onSuccess(cache.getNewsList(categoryId, page))
+        return if (cache.containsNewsPage(categoryId, page)) {
+            cache.getNewsList(categoryId, page)
         } else {
-            remoteDS.getNewsList(categoryId, page) { result ->
-                result
-                    .onSuccess {
-                        Log.d(TAG, "getNewsList onSuccess called")
-                        if (it != null) {
-                            if (it.code == 0) {
-                                cache.addNewsPage(categoryId, page, it.list)
-                                onSuccess(it.list)
-                            } else {
-                                Log.i(TAG, it.message)
-                                onFailure(it.message)
-                            }
-                        } else {
-                            Log.i(TAG, "newsList == null error")
-                            onFailure("Undefined error")
+            withContext(dispatcher) {
+                remoteDS.getNewsList(categoryId, page).also {
+                    if (it.code == 0) {
+                        cacheMutex.withLock {
+                            cache.addNewsPage(categoryId, page, it.list)
                         }
+                    } else {
+                        throw Throwable(it.message)
                     }
-                    .onFailure {
-                        Log.d(TAG, "getNewsList onFailure called")
-                        Log.i(TAG, it.message ?: "Undefine error")
-                        onFailure(it.message ?: "Undefine error")
-                    }
+                }.list
+
             }
         }
     }
 
-    override fun getNews(
-        newsId: Long,
-        onSuccess: (News) -> Unit,
-        onPartialSuccess: (News) -> Unit,
-        //here Failure is error during fullDescription loading
-        onFailure: (String) -> Unit
-    ) {
+    override suspend fun getQuickNews(
+        newsId: Long
+    ): News {
+        Log.d(TAG, "getQuickNews was called")
+        return cache.getNews(newsId)
+    }
+
+    override suspend fun getNews(
+        newsId: Long
+    ): News {
         Log.d(TAG, "getNews was called")
         val currentNews = cache.getNews(newsId)
-        //State, where currentNews == null (empty object in this case),
-        // is unreachable with current navigation logic
-        if (currentNews.state) {
-            onSuccess(currentNews)
+        return if (currentNews.state) {
+            currentNews
         } else {
-            onPartialSuccess(currentNews)
-            getNewsFromRemote(newsId, onSuccess, onFailure)
-        }
-    }
-
-    private fun getNewsFromRemote(
-        newsId: Long,
-        onSuccess: (News) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        remoteDS.getNews(newsId) { result ->
-            result
-                .onSuccess {
-                    Log.d(TAG, "getNews onSuccess called")
-                    if (it != null) { //we got something from api
+            withContext(dispatcher) {
+                try {
+                    remoteDS.getNews(newsId).also {
                         if (it.code == 0) {
-                            cache.setNews(it.news, true)
-                            onSuccess(it.news)
+                            cacheMutex.withLock {
+                                cache.setNews(it.news, true)
+                            }
                         } else {
-                            Log.i(TAG, it.message)
-                            onFailure(it.message)
+                            throw Throwable(it.message)
                         }
-                    } else { //we got null object from api
-                        Log.i(TAG, "news == null error")
-                        onFailure("Undefined error")
-                    }
+                    }.news
+                } catch (t: Throwable) {
+                    currentNews
                 }
-                .onFailure {
-                    Log.d(TAG, "getNews onFailure called")
-                    Log.i(TAG, it.message ?: "Undefine error")
-                    onFailure(it.message ?: "Undefine error")
-                }
+
+            }
         }
     }
 }
