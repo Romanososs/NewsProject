@@ -17,7 +17,7 @@ import com.example.newsproject.ui.newsList.NewsListScreen
 import com.example.newsproject.ui.theme.NewsAppTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
-const val durationMil: Int = 1000
+const val durationMil: Int = 500
 
 sealed class Screen(val title: String) {
     object CategoryList : Screen("CategoryList")
@@ -29,20 +29,24 @@ sealed class Screen(val title: String) {
 @Composable
 fun MainScreen() {
     val navController = rememberAnimatedNavController()
-    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val screenWidth =
+        LocalConfiguration.current.screenWidthDp * LocalConfiguration.current.densityDpi
     NewsAppTheme {
         Scaffold {
             AnimatedNavHost(navController, startDestination = Screen.CategoryList.title) {
                 composable(
                     route = Screen.CategoryList.title,
-                    //hard to animate transition with cards in the layout
 //                    exitTransition = {
 //                        slideOutHorizontally(
-//                            targetOffsetX = { screenWidth }) +
-//                                fadeOut(animationSpec = tween(durationMil))
+//                            targetOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    popEnterTransition = {
-//                        slideInHorizontally(initialOffsetX = { -screenWidth })
+//                        slideInHorizontally(
+//                            initialOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    }
                 ) {
                     CategoryListScreen { id ->
@@ -53,19 +57,28 @@ fun MainScreen() {
                     route = "${Screen.NewsList.title}/{categoryId}",
                     arguments = listOf(navArgument("categoryId") { type = NavType.LongType }),
 //                    enterTransition = {
-//                        slideInHorizontally() +
-//                                fadeIn(animationSpec = tween(durationMil))
+//                        slideInHorizontally(
+//                            initialOffsetX = { screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    exitTransition = {
 //                        slideOutHorizontally(
-//                            targetOffsetX = { screenWidth }) +
-//                                fadeOut(animationSpec = tween(durationMil))
+//                            targetOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    popEnterTransition = {
-//                        slideInHorizontally(initialOffsetX = { -screenWidth })
+//                        slideInHorizontally(
+//                            initialOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    popExitTransition = {
-//                        slideOutHorizontally()
+//                        slideOutHorizontally(
+//                            targetOffsetX = { screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    }
                 ) {
                     NewsListScreen(
@@ -78,18 +91,28 @@ fun MainScreen() {
                     route = "${Screen.News.title}/{newsId}",
                     arguments = listOf(navArgument("newsId") { type = NavType.LongType }),
 //                    enterTransition = {
-//                        slideInHorizontally() +
-//                                fadeIn(animationSpec = tween(durationMil))
+//                        slideInHorizontally(
+//                            initialOffsetX = { screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    exitTransition = {
-//                        slideOutHorizontally(targetOffsetX = { screenWidth }) +
-//                                fadeOut(animationSpec = tween(durationMil))
+//                        slideOutHorizontally(
+//                            targetOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    popEnterTransition = {
-//                        slideInHorizontally(initialOffsetX = { -screenWidth })
+//                        slideInHorizontally(
+//                            initialOffsetX = { -screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    },
 //                    popExitTransition = {
-//                        slideOutHorizontally()
+//                        slideOutHorizontally(
+//                            targetOffsetX = { screenWidth },
+//                            animationSpec = tween(durationMil)
+//                        )
 //                    }
                 ) {
                     NewsScreen(

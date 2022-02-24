@@ -1,20 +1,19 @@
 package com.example.newsproject.ui.categoryList
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults.elevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,8 +32,7 @@ fun CategoryListScreen(navigateToNewsList: (id: Long) -> Unit) {
     // Livedata to State
     val items: List<Category> by viewModel.list.observeAsState(listOf())
     val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
-    when (state)
-    {
+    when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> CategoryListList(
             list = items,
@@ -45,6 +43,7 @@ fun CategoryListScreen(navigateToNewsList: (id: Long) -> Unit) {
         else -> FailedScreen(viewModel.errorMessage.value ?: "")
     }
 }
+
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -65,21 +64,23 @@ fun CategoryListList(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CategoryListItem(category: Category, onClick: (category: Category) -> Unit) {
-    Card(
-        shape = RoundedCornerShape(5.dp),
+    Button(
         onClick = { onClick(category) },
+        contentPadding = PaddingValues(16.dp),
+        shape = RoundedCornerShape(5.dp),
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+        elevation = elevation(defaultElevation = 10.dp, pressedElevation = 10.dp),
         modifier = Modifier
             .height(85.dp)
-    ) {
+    ){
         Text(
             text = category.name,
             style = TextStyle(fontSize = 20.sp),
             maxLines = 2,
             modifier = Modifier
-                .padding(16.dp)
+                .fillMaxSize()
                 .wrapContentHeight(Alignment.CenterVertically)
         )
     }
