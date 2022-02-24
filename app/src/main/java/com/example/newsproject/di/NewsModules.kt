@@ -1,5 +1,6 @@
 package com.example.newsproject.di
 
+import android.util.Log
 import com.example.newsproject.data.NewsRemoteDataSource
 import com.example.newsproject.data.NewsRemoteDataSourceImpl
 import com.example.newsproject.data.NewsRepository
@@ -16,8 +17,17 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
+import io.ktor.client.engine.android.*
+import io.ktor.client.features.*
+import io.ktor.client.features.logging.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import javax.inject.Singleton
 
 @Module
@@ -32,8 +42,37 @@ class AppProvideModule {
     @Singleton
     @Provides
     fun provideNewsRemoteDataSource(
-    ): NewsRemoteDataSource = NewsRemoteDataSourceImpl(IO)
+        client: HttpClient
+    ): NewsRemoteDataSource = NewsRemoteDataSourceImpl(client, IO)
+
+    @Provides
+    fun provideHttpClient(httpClientEngine: HttpClientEngine) = HttpClient(httpClientEngine) {
+        install(JsonFeature) {
+            serializer = KotlinxSerializer(
+                kotlinx.serialization.json.Json {
+                    isLenient = true
+                    ignoreUnknownKeys = true }
+            )
+        }
+        install(DefaultRequest) {
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
+        }
+        install(Logging) {
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Log.v("MyLogger_Ktor", message)
+                }
+
+            }
+            level = LogLevel.ALL
+        }
+    }
+
+    //creating engine for android platform
+    @Provides
+    fun provideHttpClientEngine(): HttpClientEngine = Android.create()
 }
+
 
 @Module
 @InstallIn(ViewModelComponent::class)

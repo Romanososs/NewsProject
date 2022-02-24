@@ -1,21 +1,27 @@
 package com.example.newsproject.data
 
+import kotlinx.datetime.LocalDate
 import java.time.Instant
 import java.util.Date
+import kotlinx.serialization.*
+import java.time.LocalDateTime
 
 //API Models
+@Serializable
 data class ApiCategoryList(
     val code: Int = -1,
     val message: String = "",
     val list: List<Category> = emptyList()
 )
 
+@Serializable
 data class ApiNewsList(
     val code: Int = -1,
     val message: String = "",
     val list: MutableList<News> = mutableListOf()
 )
 
+@Serializable
 data class ApiNews(
     val code: Int = -1,
     val message: String = "",
@@ -70,15 +76,17 @@ data class NewsPage(
 
 
 //Data Model
+@Serializable
 data class Category(
     val id: Long = -1,
     val name: String = ""
 )
 
+@Serializable
 data class News(
     val id: Long = -1,
     val title: String = "",
-    val date: Date = Date.from(Instant.now()),
+    val date: LocalDate = LocalDate(1980, 1, 1),
     val shortDescription: String = "",
     val fullDescription: String = "",
     //true - have fullDescription, false - fullDescription is empty str

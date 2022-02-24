@@ -1,48 +1,44 @@
 package com.example.newsproject.data
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.response.*
+import io.ktor.client.statement.*
 import javax.inject.Inject
 
 class NewsRemoteDataSourceImpl @Inject constructor(
-    private val dispatcher: CoroutineDispatcher
+    private val client: HttpClient
 ) :
     NewsRemoteDataSource {
     private val BASE_URL = "http://testtask.sebbia.com/v1/news/"
     private val TAG = "MyNewsRemoteDataSource"
 
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitService::class.java)
 
-    override suspend fun getCategoryList() =
-        withContext(dispatcher) {
-            Log.d(TAG, "retrofitService.getCategoryList called")
-            retrofitService.getCategoryList()
-        }
+    override suspend fun getCategoryList(): ApiCategoryList {
+        Log.d(TAG, "getCategoryList called")
+        return client.get<HttpStatement>("${BASE_URL}categories").body<ApiCategoryList>()
+    }
 
 
     override suspend fun getNewsList(
         categoryId: Long,
         page: Int
-    ) = withContext(dispatcher) {
-        Log.d(TAG, "retrofitService.getNewsList called with categoryId = $categoryId, page = $page")
-        retrofitService.getNewsList(categoryId, page)
+    ): ApiNewsList {
+        Log.d(TAG, "getNewsList called with categoryId = $categoryId, page = $page")
+        return client.get("${BASE_URL}categories/${categoryId}/news") {
+            parameter("page", page)
+        }
     }
 
     override suspend fun getNews(
         newsId: Long
-    ) = withContext(dispatcher) {
-        Log.d(TAG, "retrofitService.getNews called with newsId = $newsId")
-        retrofitService.getNews(newsId)
+    ): ApiNews {
+        Log.d(TAG, "getNews called with newsId = $newsId")
+        return client.get("${BASE_URL}details") {
+            parameter("id", newsId)
+        }
     }
 
 }
