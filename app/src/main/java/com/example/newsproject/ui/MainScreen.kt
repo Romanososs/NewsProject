@@ -1,18 +1,23 @@
 package com.example.newsproject.ui
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import androidx.navigation.navArgument
 import com.example.newsproject.ui.categoryList.CategoryListScreen
 import com.example.newsproject.ui.news.NewsScreen
 import com.example.newsproject.ui.newsList.NewsListScreen
 import com.example.newsproject.ui.theme.NewsAppTheme
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+
+const val durationMil: Int = 1000
 
 sealed class Screen(val title: String) {
     object CategoryList : Screen("CategoryList")
@@ -20,22 +25,24 @@ sealed class Screen(val title: String) {
     object News : Screen("News")
 }
 
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
+    val navController = rememberAnimatedNavController()
+    val screenWidth = LocalConfiguration.current.screenWidthDp
     NewsAppTheme {
         Scaffold {
-            NavHost(navController, startDestination = Screen.CategoryList.title) {
+            AnimatedNavHost(navController, startDestination = Screen.CategoryList.title) {
                 composable(
                     route = Screen.CategoryList.title,
+                    //hard to animate transition with cards in the layout
 //                    exitTransition = {
-//                        slideOutHorizontally() +
-//                                fadeOut(animationSpec = tween(1000))
+//                        slideOutHorizontally(
+//                            targetOffsetX = { screenWidth }) +
+//                                fadeOut(animationSpec = tween(durationMil))
 //                    },
 //                    popEnterTransition = {
-//                        slideInHorizontally()
+//                        slideInHorizontally(initialOffsetX = { -screenWidth })
 //                    }
                 ) {
                     CategoryListScreen { id ->
@@ -44,24 +51,50 @@ fun MainScreen() {
                 }
                 composable(
                     route = "${Screen.NewsList.title}/{categoryId}",
-                    arguments = listOf(navArgument("categoryId") { type = NavType.LongType })
+                    arguments = listOf(navArgument("categoryId") { type = NavType.LongType }),
 //                    enterTransition = {
 //                        slideInHorizontally() +
-//                                fadeIn(animationSpec = tween(1000))
+//                                fadeIn(animationSpec = tween(durationMil))
+//                    },
+//                    exitTransition = {
+//                        slideOutHorizontally(
+//                            targetOffsetX = { screenWidth }) +
+//                                fadeOut(animationSpec = tween(durationMil))
+//                    },
+//                    popEnterTransition = {
+//                        slideInHorizontally(initialOffsetX = { -screenWidth })
 //                    },
 //                    popExitTransition = {
 //                        slideOutHorizontally()
 //                    }
                 ) {
-                    NewsListScreen { id ->
+                    NewsListScreen(
+                        it.arguments?.getLong("categoryId") ?: -1
+                    ) { id ->
                         navController.navigate("${Screen.News.title}/${id}")
                     }
                 }
                 composable(
                     route = "${Screen.News.title}/{newsId}",
-                    arguments = listOf(navArgument("newsId") { type = NavType.LongType })
+                    arguments = listOf(navArgument("newsId") { type = NavType.LongType }),
+//                    enterTransition = {
+//                        slideInHorizontally() +
+//                                fadeIn(animationSpec = tween(durationMil))
+//                    },
+//                    exitTransition = {
+//                        slideOutHorizontally(targetOffsetX = { screenWidth }) +
+//                                fadeOut(animationSpec = tween(durationMil))
+//                    },
+//                    popEnterTransition = {
+//                        slideInHorizontally(initialOffsetX = { -screenWidth })
+//                    },
+//                    popExitTransition = {
+//                        slideOutHorizontally()
+//                    }
                 ) {
-                    NewsScreen()
+                    NewsScreen(
+                        it.arguments?.getLong("newsId") ?: -1
+                    )
                 }
             }
         }

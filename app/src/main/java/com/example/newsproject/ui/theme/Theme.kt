@@ -20,7 +20,8 @@ private val LightColorPalette = lightColors(
     secondaryVariant = Teal700,
     onSecondary = Black,
     background = White200,
-    surface = White
+    surface = White,
+
 )
 
 @Composable
@@ -30,11 +31,8 @@ fun NewsAppTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composabl
     } else {
         LightColorPalette
     }
-
     MaterialTheme(
         colors = colors,
-//        typography = Typography,
-//        shapes = Shapes,
         content = content
     )
 }

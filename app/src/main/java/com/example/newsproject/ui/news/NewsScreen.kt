@@ -1,6 +1,5 @@
 package com.example.newsproject.ui.news
 
-import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -12,19 +11,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.newsproject.data.News
+import com.example.newsproject.ui.screenState.FailedScreen
+import com.example.newsproject.ui.screenState.LoadingScreen
+import com.example.newsproject.ui.screenState.ScreenState
 import com.example.newsproject.ui.theme.Black
 import com.example.newsproject.ui.theme.Grey700
 import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun NewsScreen() {
-    val viewModel: NewsViewModel = getViewModel<NewsViewModelImpl>()
+fun NewsScreen(newsId: Long) {
+    val viewModel: NewsViewModel = getViewModel<NewsViewModelImpl> { parametersOf(newsId) }
     // Livedata to State
     val news: News by viewModel.news.observeAsState(News())
-    NewsLayout(news = news)
+    val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
+    when (state)
+    {
+        ScreenState.IsLoading -> LoadingScreen()
+        ScreenState.IsReady -> NewsLayout(news = news)
+        else -> FailedScreen(viewModel.errorMessage.value ?: "")
+    }
+
 }
 
-@SuppressLint("SimpleDateFormat")
 @Composable
 fun NewsLayout(news: News) {
     Column {
@@ -51,7 +60,9 @@ fun NewsLayout(news: News) {
                 )
         )
         AndroidView(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxHeight(),
             factory = {
                 WebView(it).apply {
                     loadData(

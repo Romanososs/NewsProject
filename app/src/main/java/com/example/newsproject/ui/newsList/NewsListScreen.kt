@@ -15,31 +15,35 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.newsproject.data.News
-import com.example.newsproject.ui.Screen
+import com.example.newsproject.ui.screenState.FailedScreen
+import com.example.newsproject.ui.screenState.LoadingScreen
+import com.example.newsproject.ui.screenState.ScreenState
 import com.example.newsproject.ui.theme.Black
 import com.example.newsproject.ui.theme.Grey700
-import org.koin.androidx.compose.getStateViewModel
 import org.koin.androidx.compose.getViewModel
-import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 
-@ExperimentalMaterialApi
 @Composable
-fun NewsListScreen(navigateToNews:(id: Long) -> Unit) {
-    val viewModel: NewsListViewModel = getViewModel<NewsListViewModelImpl>()
+fun NewsListScreen(categoryId: Long, navigateToNews: (id: Long) -> Unit) {
+    val viewModel: NewsListViewModel = getViewModel<NewsListViewModelImpl> { parametersOf(categoryId) }
     // Livedata to State
     val items: List<News> by viewModel.list.observeAsState(listOf())
-    NewsListList(
-        list = items,
-        onItemClick = {
-            navigateToNews(it.id)
-        }
-    )
+    val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
+    when (state)
+    {
+        ScreenState.IsLoading -> LoadingScreen()
+        ScreenState.IsReady -> NewsListList(
+            list = items,
+            onItemClick = {
+                navigateToNews(it.id)
+            }
+        )
+        else -> FailedScreen(viewModel.errorMessage.value ?: "")
+    }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun NewsListList(
     list: List<News>,
@@ -55,14 +59,13 @@ fun NewsListList(
     }
 }
 
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("SimpleDateFormat")
 @Composable
 fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
     Card(
         shape = RoundedCornerShape(5.dp),
-        backgroundColor = MaterialTheme.colors.surface, //TODO check mb redo
-        onClick = { onClick(news) },//TODO add
+        onClick = { onClick(news) },
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

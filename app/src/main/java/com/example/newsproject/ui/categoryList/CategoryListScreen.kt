@@ -1,7 +1,5 @@
 package com.example.newsproject.ui.categoryList
 
-import android.os.Bundle
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
@@ -20,32 +18,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.newsproject.data.Category
-import com.example.newsproject.ui.Screen
+import com.example.newsproject.ui.screenState.FailedScreen
+import com.example.newsproject.ui.screenState.LoadingScreen
+import com.example.newsproject.ui.screenState.ScreenState
 import org.koin.androidx.compose.getStateViewModel
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.viewModel
 
 
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
 @Composable
 fun CategoryListScreen(navigateToNewsList: (id: Long) -> Unit) {
     val viewModel: CategoryListViewModel = getViewModel<CategoryListViewModelImpl>()
     // Livedata to State
     val items: List<Category> by viewModel.list.observeAsState(listOf())
-    CategoryListList(
-        list = items,
-        onItemClick = {
-            navigateToNewsList(it.id)
-        }
-    )
+    val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
+    when (state)
+    {
+        ScreenState.IsLoading -> LoadingScreen()
+        ScreenState.IsReady -> CategoryListList(
+            list = items,
+            onItemClick = {
+                navigateToNewsList(it.id)
+            }
+        )
+        else -> FailedScreen(viewModel.errorMessage.value ?: "")
+    }
 }
 
 
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryListList(
     list: List<Category>,
@@ -63,12 +65,11 @@ fun CategoryListList(
     }
 }
 
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CategoryListItem(category: Category, onClick: (category: Category) -> Unit) {
     Card(
         shape = RoundedCornerShape(5.dp),
-        backgroundColor = MaterialTheme.colors.surface, //TODO check mb redo
         onClick = { onClick(category) },
         modifier = Modifier
             .height(85.dp)

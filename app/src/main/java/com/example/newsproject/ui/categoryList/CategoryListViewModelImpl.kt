@@ -4,11 +4,9 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
-import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.Category
 import com.example.newsproject.data.NewsRepository
-import com.example.newsproject.ui.FragmentState
+import com.example.newsproject.ui.screenState.ScreenState
 import kotlinx.coroutines.launch
 
 class CategoryListViewModelImpl (
@@ -17,9 +15,9 @@ class CategoryListViewModelImpl (
     ViewModel(),
     CategoryListViewModel {
     private val TAG = "MyCategoryListViewModel"
-    override val list: MutableLiveData<List<Category>> = MutableLiveData()
-    override val navEvent: SingleLiveEvent<NavDirections> = SingleLiveEvent()
-    override val state: MutableLiveData<FragmentState> = MutableLiveData(FragmentState.isLoading)
+
+    override val list: MutableLiveData<List<Category>> = MutableLiveData(listOf())
+    override val state: MutableLiveData<ScreenState> = MutableLiveData(ScreenState.IsLoading)
     override val errorMessage: MutableLiveData<String> = MutableLiveData("")
 
     init {
@@ -27,19 +25,12 @@ class CategoryListViewModelImpl (
             Log.d(TAG, "was initialized")
             try {
                 list.value = repository.getCategoryList()
-                state.value = FragmentState.isReady
+                state.value = ScreenState.IsReady
             } catch (t: Throwable) {
                 Log.d(TAG, "caught throwable '${t.message}'")
                 errorMessage.value = t.message
-                state.value = FragmentState.isFailed
+                state.value = ScreenState.IsFailed
             }
         }
-    }
-
-
-    override fun onItemClicked(categoryId: Long) {
-        Log.d(TAG, "onItemClicked called")
-        navEvent.value = CategoryListFragmentDirections
-            .actionCategoryListFragmentToNewsListFragment(categoryId)
     }
 }

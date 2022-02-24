@@ -17,6 +17,8 @@
         <entry key="..\:/Users/Veronika/Desktop/Work/NewsProject/app/src/main/res/layout/state_loading.xml" value="0.17074275362318841" />
         <entry key="..\:/Users/Veronika/Desktop/Work/NewsProject/app/src/main/res/menu/bottom_nav_menu.xml" value="0.22447916666666667" />
         <entry key="..\:/Users/Veronika/Desktop/Work/NewsProject/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.139" />
+        <entry key="app/src/main/res/layout/state_failed.xml" value="0.31197916666666664" />
+        <entry key="app/src/main/res/layout/state_loading.xml" value="0.14166666666666666" />
       </map>
     </option>
   </component>

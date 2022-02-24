@@ -2,39 +2,31 @@ package com.example.newsproject.ui.newsList
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
-import com.example.newsproject.utils.SingleLiveEvent
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
-import com.example.newsproject.ui.FragmentState
+import com.example.newsproject.ui.screenState.ScreenState
 import kotlinx.coroutines.launch
 
 class NewsListViewModelImpl (
     private val repository: NewsRepository,
-    private val savedState: SavedStateHandle
+    private val categoryId: Long
 ) : ViewModel(),
     NewsListViewModel {
     private val TAG = "MyNewsListViewModel"
 
-    override val list: MutableLiveData<MutableList<News>> = MutableLiveData()
-    override val navEvent: SingleLiveEvent<NavDirections> = SingleLiveEvent()
-    override val state: MutableLiveData<FragmentState> = MutableLiveData(FragmentState.isLoading)
+    override val list: MutableLiveData<MutableList<News>> = MutableLiveData(mutableListOf())
+    override val state: MutableLiveData<ScreenState> = MutableLiveData(ScreenState.IsLoading)
     override val errorMessage: MutableLiveData<String> = MutableLiveData("")
 
-    private val categoryId = savedState.get<Long>("categoryId") ?: -1
+    //private val categoryId = savedState.get<Long>("categoryId") ?: -1
 
     //if nextPage == null -> last page loading returned empty list aka it's the last page
     private var nextPage: Int? = 0
 
     init {
         Log.d(TAG, "was initialized")
-    }
-
-    override fun onCreateView() {
-        list.value = mutableListOf()
         getNewPage()
     }
 
@@ -54,22 +46,13 @@ class NewsListViewModelImpl (
                         nextPage = nextPage!! + 1
                     } else
                         nextPage = null
-                    state.value = FragmentState.isReady
+                    state.value = ScreenState.IsReady
                 } catch (t: Throwable) {
                     Log.d(TAG, "caught throwable '${t.message}'")
                     errorMessage.value = t.message
-                    state.value = FragmentState.isFailed
+                    state.value = ScreenState.IsFailed
                 }
             }
     }
 
-    override fun onDestroyView() {
-        nextPage = 0
-    }
-
-    override fun onItemClicked(newsId: Long) {
-        Log.d(TAG, "onItemClicked called")
-        navEvent.value = NewsListFragmentDirections
-            .actionNewsListFragmentToNewsFragment(newsId)
-    }
 }

@@ -31,8 +31,11 @@ val NewsModule = module {
 
     viewModel { CategoryListViewModelImpl(get()) }
     viewModel { params ->
-        NewsListViewModelImpl(get(), params.get()) }
-    viewModel { NewsViewModelImpl(get(), get()) }
+        NewsListViewModelImpl(get(), params.get())
+    }
+    viewModel { params ->
+        NewsViewModelImpl(get(), params.get())
+    }
 }
 
 
