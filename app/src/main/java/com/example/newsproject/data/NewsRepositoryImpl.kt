@@ -52,7 +52,6 @@ class NewsRepositoryImpl @Inject constructor(
                         throw Throwable(it.message)
                     }
                 }.list
-
             }
         }
     }

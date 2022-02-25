@@ -27,7 +27,6 @@ import io.ktor.client.engine.android.*
 import io.ktor.client.features.*
 import io.ktor.client.features.logging.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import javax.inject.Singleton
 
 @Module
@@ -55,14 +54,13 @@ class AppProvideModule {
             )
         }
         install(DefaultRequest) {
-            header(HttpHeaders.ContentType, ContentType.Application.Json)
+            header("Accept", "application/json")
         }
         install(Logging) {
             logger = object : Logger {
                 override fun log(message: String) {
                     Log.v("MyLogger_Ktor", message)
                 }
-
             }
             level = LogLevel.ALL
         }

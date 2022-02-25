@@ -8,6 +8,7 @@ buildscript {
         hilt_version = "2.38.1"
     }
     repositories {
+        mavenCentral()
         google()
     }
     dependencies {

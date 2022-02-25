@@ -1,8 +1,6 @@
 package com.example.newsproject.data
 
-import kotlinx.datetime.LocalDate
-import java.time.Instant
-import java.util.Date
+import kotlinx.datetime.Instant
 import kotlinx.serialization.*
 import java.time.LocalDateTime
 
@@ -86,7 +84,7 @@ data class Category(
 data class News(
     val id: Long = -1,
     val title: String = "",
-    val date: LocalDate = LocalDate(1980, 1, 1),
+    val date: Instant = Instant.DISTANT_PAST,
     val shortDescription: String = "",
     val fullDescription: String = "",
     //true - have fullDescription, false - fullDescription is empty str
