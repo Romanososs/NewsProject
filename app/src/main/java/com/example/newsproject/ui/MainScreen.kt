@@ -8,7 +8,10 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavType
-import com.google.accompanist.navigation.animation.composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+//import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import androidx.navigation.navArgument
 import com.example.newsproject.ui.categoryList.CategoryListScreen
@@ -25,29 +28,17 @@ sealed class Screen(val title: String) {
     object News : Screen("News")
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+
 @Composable
 fun MainScreen() {
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
     val screenWidth =
         LocalConfiguration.current.screenWidthDp * LocalConfiguration.current.densityDpi
     NewsAppTheme {
         Scaffold {
-            AnimatedNavHost(navController, startDestination = Screen.CategoryList.title) {
+            NavHost(navController, startDestination = Screen.CategoryList.title) {
                 composable(
                     route = Screen.CategoryList.title,
-//                    exitTransition = {
-//                        slideOutHorizontally(
-//                            targetOffsetX = { -screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    },
-//                    popEnterTransition = {
-//                        slideInHorizontally(
-//                            initialOffsetX = { -screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    }
                 ) {
                     CategoryListScreen { id ->
                         navController.navigate("${Screen.NewsList.title}/${id}")
@@ -56,33 +47,9 @@ fun MainScreen() {
                 composable(
                     route = "${Screen.NewsList.title}/{categoryId}",
                     arguments = listOf(navArgument("categoryId") { type = NavType.LongType }),
-//                    enterTransition = {
-//                        slideInHorizontally(
-//                            initialOffsetX = { screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    },
-//                    exitTransition = {
-//                        slideOutHorizontally(
-//                            targetOffsetX = { -screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    },
-//                    popEnterTransition = {
-//                        slideInHorizontally(
-//                            initialOffsetX = { -screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    },
-//                    popExitTransition = {
-//                        slideOutHorizontally(
-//                            targetOffsetX = { screenWidth },
-//                            animationSpec = tween(durationMil)
-//                        )
-//                    }
                 ) {
                     NewsListScreen(
-                        it.arguments?.getLong("categoryId") ?: -1
+                        categoryId = it.arguments?.getLong("categoryId") ?: -1
                     ) { id ->
                         navController.navigate("${Screen.News.title}/${id}")
                     }
@@ -90,6 +57,16 @@ fun MainScreen() {
                 composable(
                     route = "${Screen.News.title}/{newsId}",
                     arguments = listOf(navArgument("newsId") { type = NavType.LongType }),
+                ) {
+                    NewsScreen(
+                        newsId = it.arguments?.getLong("newsId") ?: -1
+                    )
+                }
+            }
+        }
+    }
+}
+
 //                    enterTransition = {
 //                        slideInHorizontally(
 //                            initialOffsetX = { screenWidth },
@@ -114,12 +91,3 @@ fun MainScreen() {
 //                            animationSpec = tween(durationMil)
 //                        )
 //                    }
-                ) {
-                    NewsScreen(
-                        it.arguments?.getLong("newsId") ?: -1
-                    )
-                }
-            }
-        }
-    }
-}

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -20,13 +21,14 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun NewsScreen(newsId: Long) {
-    val viewModel: NewsViewModel = getViewModel<NewsViewModelImpl> { parametersOf(newsId) }
+fun NewsScreen(
+    viewModel: NewsViewModel = getViewModel<NewsViewModelImpl> { parametersOf(newsId) },
+    newsId: Long
+) {
     // Livedata to State
     val news: News by viewModel.news.observeAsState(News())
     val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
-    when (state)
-    {
+    when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> NewsLayout(news = news)
         else -> FailedScreen(viewModel.errorMessage.value ?: "")
@@ -62,7 +64,8 @@ fun NewsLayout(news: News) {
         AndroidView(
             modifier = Modifier
                 .padding(top = 8.dp)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .testTag("NewsWebView"),
             factory = {
                 WebView(it).apply {
                     loadData(
