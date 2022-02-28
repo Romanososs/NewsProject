@@ -1,10 +1,7 @@
 package com.example.newsproject
 
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import com.example.newsproject.ui.MainActivity
-import com.example.newsproject.ui.MainScreen
 import com.example.newsproject.ui.categoryList.CategoryListScreen
 import com.example.newsproject.ui.categoryList.CategoryListViewModelImpl
 import com.example.newsproject.ui.news.NewsScreen
@@ -12,13 +9,11 @@ import com.example.newsproject.ui.news.NewsViewModelImpl
 import com.example.newsproject.ui.newsList.DateTimeFormat
 import com.example.newsproject.ui.newsList.NewsListScreen
 import com.example.newsproject.ui.newsList.NewsListViewModelImpl
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
 import java.text.SimpleDateFormat
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NewsAppUITest {
     @get: Rule
     val composeTestRule = createComposeRule()
@@ -31,7 +26,7 @@ class NewsAppUITest {
         composeTestRule.setContent {
             CategoryListScreen(categoryListVM, navigateToNewsList = {})
         }
-        runBlockingTest{
+        runBlocking{
             val list = repo.getCategoryList()
             composeTestRule
                 .onAllNodes(hasClickAction())
@@ -49,7 +44,7 @@ class NewsAppUITest {
         composeTestRule.setContent {
             NewsListScreen(newsListVM, categoryId, navigateToNews = {})
         }
-        runBlockingTest{
+        runBlocking{
             val list = repo.getNewsList(categoryId, 0)
             composeTestRule
                 .onAllNodes(hasClickAction())
@@ -69,7 +64,7 @@ class NewsAppUITest {
         composeTestRule.setContent {
             NewsScreen(newsVM,newsId)
         }
-        runBlockingTest{
+        runBlocking{
             val news = repo.getNews(newsId)
             composeTestRule.onNodeWithText(news.title).assertExists()
             composeTestRule.onNodeWithText(news.shortDescription).assertExists()
