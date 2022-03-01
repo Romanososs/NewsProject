@@ -1,0 +1,43 @@
+CREATE TABLE Category(
+id INTEGER NOT NULL PRIMARY KEY,
+name TEXT NOT NULL
+);
+
+CREATE TABLE News(
+id INTEGER NOT NULL PRIMARY KEY,
+page INTEGER NOT NULL,
+title TEXT NOT NULL,
+date TEXT NOT NULL,
+shortDescription TEXT NOT NULL,
+fullDescription TEXT,
+category_id INTEGER NOT NULL,
+FOREIGN KEY (category_id) REFERENCES Category(id)
+);
+
+selectAllCategory:
+SELECT * FROM Category;
+
+insetIntoCategory:
+INSERT INTO Category(id, name) VALUES(?,?);
+
+deleteAllCategory:
+DELETE FROM Category;
+
+
+selectNewsPage:
+SELECT * FROM News
+WHERE category_id = ? AND page = ?;
+
+selectNews:
+SELECT * FROM News
+WHERE id = ?;
+insetIntoNews:
+INSERT INTO News(id, page, title, date, shortDescription, fullDescription, category_id) VALUES(?,?,?,?,?,?,?);
+
+updateNews:
+UPDATE News
+SET fullDescription = ?
+WHERE id = ?;
+
+deleteAllNews:
+DELETE FROM News;

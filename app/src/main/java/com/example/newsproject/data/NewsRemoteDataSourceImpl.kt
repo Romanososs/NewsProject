@@ -12,8 +12,7 @@ import javax.inject.Inject
 
 class NewsRemoteDataSourceImpl @Inject constructor(
     private val dispatcher: CoroutineDispatcher
-) :
-    NewsRemoteDataSource {
+) : NewsRemoteDataSource {
     private val BASE_URL = "http://testtask.sebbia.com/v1/news/"
     private val TAG = "MyNewsRemoteDataSource"
 

@@ -35,7 +35,9 @@ class NewsFragment : Fragment() {
             Log.d(TAG, "News data was changed")
             binding.newsTitle.text = it.title
             binding.newsShortDescription.text = it.shortDescription
-            binding.newsPage.loadData(it.fullDescription, "text/html; charset=utf-8", "UTF-8")
+            it.fullDescription?.let { fullDes ->
+                binding.newsPage.loadData(fullDes, "text/html; charset=utf-8", "UTF-8")
+            }
         }
         viewModel.state.observe(viewLifecycleOwner) {
             Log.d(TAG, "state was changed to $it")

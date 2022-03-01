@@ -6,26 +6,27 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class NewsRepositoryImpl @Inject constructor(
     private val remoteDS: NewsRemoteDataSource,
+    private val localDS: NewsLocalDataSource,
     private val dispatcher: CoroutineDispatcher
 ) : NewsRepository {
     private val TAG = "MyNewsRepository"
 
-    private val cacheMutex = Mutex()
-    private var cache: NewsCache = NewsCache()
+    //private val cacheMutex = Mutex()
+    //private var cache: NewsCache = NewsCache()
 
     override suspend fun getCategoryList(): List<Category> {
         Log.d(TAG, "getCategoryList was called")
-        return cache.categoryList.ifEmpty {
+        return localDS.getCategoryList().ifEmpty {
             withContext(dispatcher) {
                 remoteDS.getCategoryList().also {
                     if (it.code == 0) {
-                        cacheMutex.withLock {
-                            cache.categoryList = it.list
-                        }
+                        localDS.setCategoryList(it.list)
                     } else {
                         throw Throwable(it.message)
                     }
@@ -39,15 +40,18 @@ class NewsRepositoryImpl @Inject constructor(
         page: Int
     ): List<News> {
         Log.d(TAG, "getNewsList was called")
-        return if (cache.containsNewsPage(categoryId, page)) {
-            cache.getNewsList(categoryId, page)
-        } else {
+        val cache = localDS.getNewsList(categoryId, page)
+        val from = DateTimeFormatter.ISO_DATE_TIME
+        val to = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+        return cache.ifEmpty {
             withContext(dispatcher) {
                 remoteDS.getNewsList(categoryId, page).also {
                     if (it.code == 0) {
-                        cacheMutex.withLock {
-                            cache.addNewsPage(categoryId, page, it.list)
+                        it.list.forEach{ news ->
+                            news.date =
+                                to.format(LocalDateTime.parse(news.date, from))
                         }
+                        localDS.setNewsList(categoryId, page, it.list)
                     } else {
                         throw Throwable(it.message)
                     }
@@ -57,28 +61,30 @@ class NewsRepositoryImpl @Inject constructor(
         }
     }
 
+    /**
+     * Get News from local data source
+     */
     override suspend fun getQuickNews(
         newsId: Long
     ): News {
         Log.d(TAG, "getQuickNews was called")
-        return cache.getNews(newsId)
+        return localDS.getNews(newsId)
     }
+
 
     override suspend fun getNews(
         newsId: Long
     ): News {
         Log.d(TAG, "getNews was called")
-        val currentNews = cache.getNews(newsId)
-        return if (currentNews.state) {
+        val currentNews = localDS.getNews(newsId)
+        return if (currentNews.fullDescription != null) {
             currentNews
         } else {
             withContext(dispatcher) {
                 try {
                     remoteDS.getNews(newsId).also {
                         if (it.code == 0) {
-                            cacheMutex.withLock {
-                                cache.setNews(it.news, true)
-                            }
+                            localDS.updateNews(it.news)
                         } else {
                             throw Throwable(it.message)
                         }
