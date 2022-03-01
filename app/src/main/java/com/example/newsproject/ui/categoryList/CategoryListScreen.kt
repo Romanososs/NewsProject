@@ -32,8 +32,8 @@ fun CategoryListScreen(
     navigateToNewsList: (id: Long) -> Unit
 ) {
     // Livedata to State
-    val items: List<Category> by viewModel.list.observeAsState(listOf())
-    val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
+    val items: List<Category> by viewModel.list
+    val state: ScreenState by viewModel.state
     when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> CategoryListList(
@@ -42,7 +42,7 @@ fun CategoryListScreen(
                 navigateToNewsList(it.id)
             }
         )
-        else -> FailedScreen(viewModel.errorMessage.value ?: "")
+        else -> FailedScreen(viewModel.errorMessage ?: "")
     }
 }
 

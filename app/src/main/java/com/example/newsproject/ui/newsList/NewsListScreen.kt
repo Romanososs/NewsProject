@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -34,9 +35,8 @@ fun NewsListScreen(
     categoryId: Long,
     navigateToNews: (id: Long) -> Unit
 ) {
-    // Livedata to State
-    val items: List<News> by viewModel.list.observeAsState(listOf())
-    val state: ScreenState by viewModel.state.observeAsState(ScreenState.IsLoading)
+    val items: SnapshotStateList<News> = viewModel.list
+    val state: ScreenState by viewModel.state
     when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> NewsListList(
@@ -45,7 +45,7 @@ fun NewsListScreen(
                 navigateToNews(it.id)
             }
         )
-        else -> FailedScreen(viewModel.errorMessage.value ?: "")
+        else -> FailedScreen(viewModel.errorMessage ?: "")
     }
 }
 

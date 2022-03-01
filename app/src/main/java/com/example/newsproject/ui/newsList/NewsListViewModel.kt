@@ -1,13 +1,13 @@
 package com.example.newsproject.ui.newsList
 
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.newsproject.data.News
 import com.example.newsproject.ui.screenState.ScreenState
 
 interface NewsListViewModel {
-    val list: MutableLiveData<MutableList<News>>
-    val state: MutableLiveData<ScreenState>
-    val errorMessage: MutableLiveData<String>
-
+    val list: SnapshotStateList<News>
+    val state: MutableState<ScreenState>
+    var errorMessage: String
     fun getNewPage()
 }
