@@ -21,14 +21,12 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 
 
-@Config(manifest = Config.NONE)
 @RunWith(AndroidJUnit4::class)
 class CategoryListViewModelTest {
-    @Mock
-    private lateinit var repo: NewsRepository
 
+    @Mock
+    private var repo: NewsRepository = NewsRepositoryFake()
     private lateinit var viewModel: CategoryListViewModelImpl
-    private val observer = Observer<List<Category>> {}
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -36,19 +34,7 @@ class CategoryListViewModelTest {
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
-        runBlocking {
-           // repo = Mockito.mock(NewsRepositoryFake.class, "repo")
-            //when(repo.getCategoryList()).thenCallRealMethod()
-        //doReturn()
-            viewModel = spy(CategoryListViewModelImpl(repo))
-           viewModel.list.observeForever(observer)
-        }
-
-    }
-
-    @After
-    fun after() {
-        viewModel.list.removeObserver(observer)
+        viewModel = CategoryListViewModelImpl(repo)
     }
 
     @Test
@@ -58,10 +44,10 @@ class CategoryListViewModelTest {
         }
     }
 
+    private val vm: CategoryListViewModelImpl =
+        CategoryListViewModelImpl(NewsRepositoryFake())
     @Test
     fun getCategoryListTest() {
-        val value = viewModel.list.value
-        assertTrue(value?.isNotEmpty() ?: false)
+        assertTrue(vm.list.value.isNotEmpty())
     }
-
 }

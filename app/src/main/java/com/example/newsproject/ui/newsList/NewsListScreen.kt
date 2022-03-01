@@ -45,7 +45,7 @@ fun NewsListScreen(
                 navigateToNews(it.id)
             }
         )
-        else -> FailedScreen(viewModel.errorMessage ?: "")
+        else -> FailedScreen(viewModel.errorMessage)
     }
 }
 

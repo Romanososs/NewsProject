@@ -25,13 +25,12 @@ fun NewsScreen(
     viewModel: NewsViewModel = getViewModel<NewsViewModelImpl> { parametersOf(newsId) },
     newsId: Long
 ) {
-    // Livedata to State
     val news: News by viewModel.news
     val state: ScreenState by viewModel.state
     when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> NewsLayout(news = news)
-        else -> FailedScreen(viewModel.errorMessage ?: "")
+        else -> FailedScreen(viewModel.errorMessage)
     }
 
 }

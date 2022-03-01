@@ -31,7 +31,6 @@ fun CategoryListScreen(
     viewModel: CategoryListViewModel = getViewModel<CategoryListViewModelImpl>(),
     navigateToNewsList: (id: Long) -> Unit
 ) {
-    // Livedata to State
     val items: List<Category> by viewModel.list
     val state: ScreenState by viewModel.state
     when (state) {
@@ -42,7 +41,7 @@ fun CategoryListScreen(
                 navigateToNewsList(it.id)
             }
         )
-        else -> FailedScreen(viewModel.errorMessage ?: "")
+        else -> FailedScreen(viewModel.errorMessage)
     }
 }
 
