@@ -77,12 +77,11 @@ fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
     ) {
         Column {
             Text(
-                //TODO what to do with overFlow
                 text = news.title,
                 style = TextStyle(fontSize = 20.sp),
                 color = Black,
                 maxLines = 2,
-                //overFlow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = SimpleDateFormat(DateTimeFormat).format(news.date),
@@ -100,7 +99,8 @@ fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
                 text = news.shortDescription,
                 style = TextStyle(fontSize = 16.sp),
                 color = Black,
-                maxLines = 2
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
