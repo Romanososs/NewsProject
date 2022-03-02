@@ -40,11 +40,11 @@ class NewsListViewModelImpl (
             viewModelScope.launch {
                 try {
                     val curPage = repository.getNewsList(categoryId, nextPage!!)
-                    if (curPage.isNotEmpty()) {
+                    nextPage = if (curPage.isNotEmpty()) {
                         curPage.forEach { list.add(it) }
-                        nextPage = nextPage!! + 1
+                        nextPage!! + 1
                     } else
-                        nextPage = null
+                        null
                     state.value = ScreenState.IsReady
                 } catch (t: Throwable) {
                     Log.d(TAG, "caught throwable '${t.message}'")
