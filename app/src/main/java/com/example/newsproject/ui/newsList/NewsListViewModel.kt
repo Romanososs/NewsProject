@@ -8,6 +8,7 @@ import com.example.newsproject.ui.screenState.ScreenState
 interface NewsListViewModel {
     val list: SnapshotStateList<News>
     val state: MutableState<ScreenState>
+    val page: MutableState<Int>
     var errorMessage: String
     fun getNewPage()
 }

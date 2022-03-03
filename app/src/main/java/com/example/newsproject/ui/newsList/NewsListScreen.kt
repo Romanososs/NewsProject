@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -22,12 +23,14 @@ import com.example.newsproject.ui.screenState.FailedScreen
 import com.example.newsproject.ui.screenState.LoadingScreen
 import com.example.newsproject.ui.screenState.ScreenState
 import com.example.newsproject.ui.theme.Black
+import com.example.newsproject.ui.theme.Grey500
 import com.example.newsproject.ui.theme.Grey700
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 
 const val DateTimeFormat = "dd.MM.yyyy HH:mm"
+const val PAGE_SIZE = 10
 
 @Composable
 fun NewsListScreen(
@@ -37,12 +40,17 @@ fun NewsListScreen(
 ) {
     val items: SnapshotStateList<News> = viewModel.list
     val state: ScreenState by viewModel.state
+    val page: Int by viewModel.page
     when (state) {
         ScreenState.IsLoading -> LoadingScreen()
         ScreenState.IsReady -> NewsListList(
             list = items,
+            page = page,
             onItemClick = {
                 navigateToNews(it.id)
+            },
+            onScrollToTheEnd = {
+                viewModel.getNewPage()
             }
         )
         else -> FailedScreen(viewModel.errorMessage)
@@ -52,14 +60,18 @@ fun NewsListScreen(
 @Composable
 fun NewsListList(
     list: List<News>,
-    onItemClick: (item: News) -> Unit
+    page: Int,
+    onItemClick: (item: News) -> Unit,
+    onScrollToTheEnd: () -> Unit
 ) {
     LazyColumn(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(list) { news ->
+        itemsIndexed(list) { index, news ->
             NewsListItem(news, onItemClick)
+            if ((index + 1) >= page * PAGE_SIZE)
+                onScrollToTheEnd()
         }
     }
 }
@@ -75,7 +87,10 @@ fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
         elevation = ButtonDefaults.elevation(defaultElevation = 10.dp, pressedElevation = 10.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.Start
+        ) {
             Text(
                 text = news.title,
                 style = TextStyle(fontSize = 20.sp),
@@ -86,7 +101,7 @@ fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
             Text(
                 text = SimpleDateFormat(DateTimeFormat).format(news.date),
                 style = TextStyle(fontSize = 14.sp),
-                color = Grey700,
+                color = Grey500,
                 modifier = Modifier
                     .padding(
                         start = 4.dp,
@@ -98,8 +113,8 @@ fun NewsListItem(news: News, onClick: (news: News) -> Unit) {
             Text(
                 text = news.shortDescription,
                 style = TextStyle(fontSize = 16.sp),
-                color = Black,
-                maxLines = 2,
+                color = Grey700,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
