@@ -16,20 +16,20 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class NewsListViewModelTest {
 
-    private val repo: NewsRepository = NewsRepositoryFake()
-    private val categoryId = 0L
-    private val viewModel: NewsListViewModelImpl = NewsListViewModelImpl(repo, categoryId)
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+//    private val repo: NewsRepository = NewsRepositoryFake()
+//    private val categoryId = 0L
+//    private val viewModel: NewsListViewModelImpl = NewsListViewModelImpl(repo, categoryId)
+//
 //    @get:Rule
-//    val coroutinesDispatcherRule = CoroutineDispatcherRule()
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun getCategoryListTest() {
-        runTest {
-            assertTrue(viewModel.list.size == repo.getNewsList(categoryId, 0).size)
-        }
-    }
+//    val instantTaskExecutorRule = InstantTaskExecutorRule()
+////    @get:Rule
+////    val coroutinesDispatcherRule = CoroutineDispatcherRule()
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Test
+//    fun getCategoryListTest() {
+//        runTest {
+//            assertTrue(viewModel.list.size == repo.getNewsList(categoryId, 0).size)
+//        }
+//    }
 }

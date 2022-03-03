@@ -1,15 +1,18 @@
 package com.example.newsproject.data
 
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
+
 interface NewsRemoteDataSource {
 
-    suspend fun getCategoryList(): ApiCategoryList
+    suspend fun getCategoryList(): Flow<List<Category>>
 
     suspend fun getNewsList(
         categoryId: Long,
         page: Int
-    ): ApiNewsList
+    ): Flow<List<News>>
 
     suspend fun getNews(
         newsId: Long
-    ): ApiNews
+    ): Flow<News>
 }

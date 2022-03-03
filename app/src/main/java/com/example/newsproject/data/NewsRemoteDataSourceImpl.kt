@@ -1,45 +1,59 @@
 package com.example.newsproject.data
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 
 class NewsRemoteDataSourceImpl(
+    private val retrofitService: RetrofitService,
     private val dispatcher: CoroutineDispatcher
-) :
-    NewsRemoteDataSource {
-    private val BASE_URL = "http://testtask.sebbia.com/v1/news/"
+) : NewsRemoteDataSource {
     private val TAG = "MyNewsRemoteDataSource"
 
-    private val retrofitService = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(RetrofitService::class.java)
-
-    override suspend fun getCategoryList() =
-        withContext(dispatcher) {
-            Log.d(TAG, "retrofitService.getCategoryList called")
-            retrofitService.getCategoryList()
-        }
-
+    override suspend fun getCategoryList(): Flow<List<Category>> {
+        Log.d(TAG, "retrofitService.getCategoryList called")
+        return flow {
+            retrofitService.getCategoryList().also {
+                if (it.code == 0)
+                    emit(it.list)
+                else
+                    throw Throwable(it.message)
+            }
+        }.flowOn(dispatcher)
+    }
 
     override suspend fun getNewsList(
         categoryId: Long,
         page: Int
-    ) = withContext(dispatcher) {
+    ): Flow<List<News>> {
         Log.d(TAG, "retrofitService.getNewsList called with categoryId = $categoryId, page = $page")
-        retrofitService.getNewsList(categoryId, page)
+        return flow {
+            retrofitService.getNewsList(categoryId, page).also {
+                if (it.code == 0)
+                    emit(it.list)
+                else
+                    throw Throwable(it.message)
+            }
+        }.flowOn(dispatcher)
     }
 
     override suspend fun getNews(
         newsId: Long
-    ) = withContext(dispatcher) {
+    ): Flow<News> {
         Log.d(TAG, "retrofitService.getNews called with newsId = $newsId")
-        retrofitService.getNews(newsId)
+        return flow {
+            retrofitService.getNews(newsId).also {
+                if (it.code == 0)
+                    emit(it.news)
+                else
+                    throw Throwable(it.message)
+            }
+        }.flowOn(dispatcher)
     }
-
 }

@@ -1,18 +1,20 @@
 package com.example.newsproject.data
 
+import kotlinx.coroutines.flow.Flow
+
 interface NewsRepository {
-    suspend fun getCategoryList(): List<Category>
+    suspend fun getCategoryList(): Flow<List<Category>>
 
     suspend fun getNewsList(
         categoryId: Long,
         page: Int
-    ): List<News>
+    ): Flow<List<News>>
 
-    suspend fun getQuickNews(
+    suspend fun getNewsFromCache(
         newsId: Long
-    ): News
+    ): Flow<News>
 
     suspend fun getNews(
         newsId: Long
-    ): News
+    ): Flow<News>
 }

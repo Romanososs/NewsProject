@@ -15,17 +15,17 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class CategoryListViewModelTest {
 
-    private val repo: NewsRepository = NewsRepositoryFake()
-    private val viewModel: CategoryListViewModelImpl = CategoryListViewModelImpl(repo)
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun getCategoryListTest() {
-        runTest {
-            assertTrue(viewModel.list.value.size == repo.getCategoryList().size)
-        }
-    }
+//    private val repo: NewsRepository = NewsRepositoryFake()
+//    private val viewModel: CategoryListViewModelImpl = CategoryListViewModelImpl(repo)
+//
+//    @get:Rule
+//    val instantTaskExecutorRule = InstantTaskExecutorRule()
+//
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    @Test
+//    fun getCategoryListTest() {
+//        runTest {
+//            assertTrue(viewModel.list.value.size == repo.getCategoryList().size)
+//        }
+//    }
 }

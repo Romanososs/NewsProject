@@ -1,32 +1,27 @@
 package com.example.newsproject.di
 
-import com.example.newsproject.data.NewsRemoteDataSource
-import com.example.newsproject.data.NewsRemoteDataSourceImpl
-import com.example.newsproject.data.NewsRepository
-import com.example.newsproject.data.NewsRepositoryImpl
-import com.example.newsproject.ui.categoryList.CategoryListViewModel
+import com.example.newsproject.data.*
 import com.example.newsproject.ui.categoryList.CategoryListViewModelImpl
-import com.example.newsproject.ui.news.NewsViewModel
 import com.example.newsproject.ui.news.NewsViewModelImpl
-import com.example.newsproject.ui.newsList.NewsListViewModel
 import com.example.newsproject.ui.newsList.NewsListViewModelImpl
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.assisted.Assisted
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.IO
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import javax.inject.Singleton
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 val NewsModule = module {
-    single<NewsRemoteDataSource> { NewsRemoteDataSourceImpl(IO) }
+    single<RetrofitService> {
+        val BASE_URL = "http://testtask.sebbia.com/v1/news/"
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(RetrofitService::class.java)
+    }
+
+    single<NewsRemoteDataSource> { NewsRemoteDataSourceImpl(get(), IO) }
     single<NewsRepository> { NewsRepositoryImpl(get(), Default) }
 
     viewModel { CategoryListViewModelImpl(get()) }

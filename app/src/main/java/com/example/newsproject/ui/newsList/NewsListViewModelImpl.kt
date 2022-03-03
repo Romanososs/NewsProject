@@ -11,9 +11,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.newsproject.data.News
 import com.example.newsproject.data.NewsRepository
 import com.example.newsproject.ui.screenState.ScreenState
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
-class NewsListViewModelImpl (
+class NewsListViewModelImpl(
     private val repository: NewsRepository,
     private val categoryId: Long
 ) : ViewModel(),
@@ -33,19 +34,20 @@ class NewsListViewModelImpl (
     }
 
     /**
-        Load next page, viewModel page count will be increased by 1
+    Load next page, viewModel page count will be increased by 1
      */
     override fun getNewPage() {
         if (nextPage != null)
             viewModelScope.launch {
                 try {
-                    val curPage = repository.getNewsList(categoryId, nextPage!!)
-                    nextPage = if (curPage.isNotEmpty()) {
-                        curPage.forEach { list.add(it) }
-                        nextPage!! + 1
-                    } else
-                        null
-                    state.value = ScreenState.IsReady
+                    repository.getNewsList(categoryId, nextPage!!).collect { listOfCurrentPage ->
+                        nextPage = if (listOfCurrentPage.isNotEmpty()) {
+                            listOfCurrentPage.forEach { news -> list.add(news) }
+                            nextPage!! + 1
+                        } else
+                            null
+                        state.value = ScreenState.IsReady
+                    }
                 } catch (t: Throwable) {
                     Log.d(TAG, "caught throwable '${t.message}'")
                     errorMessage = t.message ?: ""

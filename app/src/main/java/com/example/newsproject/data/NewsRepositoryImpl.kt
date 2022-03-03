@@ -2,11 +2,12 @@ package com.example.newsproject.data;
 
 import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-class NewsRepositoryImpl (
+class NewsRepositoryImpl(
     private val remoteDS: NewsRemoteDataSource,
     private val dispatcher: CoroutineDispatcher
 ) : NewsRepository {
@@ -15,19 +16,17 @@ class NewsRepositoryImpl (
     private val cacheMutex = Mutex()
     private var cache: NewsCache = NewsCache()
 
-    override suspend fun getCategoryList(): List<Category> {
+    override suspend fun getCategoryList(): Flow<List<Category>> {
         Log.d(TAG, "getCategoryList was called")
-        return cache.categoryList.ifEmpty {
-            withContext(dispatcher) {
-                remoteDS.getCategoryList().also {
-                    if (it.code == 0) {
-                        cacheMutex.withLock {
-                            cache.categoryList = it.list
-                        }
-                    } else {
-                        throw Throwable(it.message)
-                    }
-                }.list
+        return if (cache.categoryList.isEmpty())
+            remoteDS.getCategoryList().onEach { list ->
+                cacheMutex.withLock {
+                    cache.categoryList = list
+                }
+            }.flowOn(dispatcher)
+        else {
+            flow {
+                emit(cache.categoryList)
             }
         }
     }
@@ -35,57 +34,43 @@ class NewsRepositoryImpl (
     override suspend fun getNewsList(
         categoryId: Long,
         page: Int
-    ): List<News> {
+    ): Flow<List<News>> {
         Log.d(TAG, "getNewsList was called")
-        return if (cache.containsNewsPage(categoryId, page)) {
-            cache.getNewsList(categoryId, page)
-        } else {
-            withContext(dispatcher) {
-                remoteDS.getNewsList(categoryId, page).also {
-                    if (it.code == 0) {
-                        cacheMutex.withLock {
-                            cache.addNewsPage(categoryId, page, it.list)
-                        }
-                    } else {
-                        throw Throwable(it.message)
-                    }
-                }.list
-
+        return if (cache.containsNewsPage(categoryId, page))
+            flow {
+                emit(cache.getNewsList(categoryId, page))
             }
-        }
+        else
+            remoteDS.getNewsList(categoryId, page).onEach { list ->
+                cacheMutex.withLock {
+                    cache.addNewsPage(categoryId, page, list)
+                }
+            }.flowOn(dispatcher)
     }
 
-    override suspend fun getQuickNews(
+    override suspend fun getNewsFromCache(
         newsId: Long
-    ): News {
-        Log.d(TAG, "getQuickNews was called")
-        return cache.getNews(newsId)
+    ): Flow<News> {
+        Log.d(TAG, "getNewsFromCache was called")
+        return flow {
+            emit(cache.getNews(newsId))
+        }
     }
 
     override suspend fun getNews(
         newsId: Long
-    ): News {
+    ): Flow<News> {
         Log.d(TAG, "getNews was called")
         val currentNews = cache.getNews(newsId)
-        return if (currentNews.state) {
-            currentNews
-        } else {
-            withContext(dispatcher) {
-                try {
-                    remoteDS.getNews(newsId).also {
-                        if (it.code == 0) {
-                            cacheMutex.withLock {
-                                cache.setNews(it.news, true)
-                            }
-                        } else {
-                            throw Throwable(it.message)
-                        }
-                    }.news
-                } catch (t: Throwable) {
-                    currentNews
-                }
-
+        return if (currentNews.state)
+            flow {
+                emit(currentNews)
             }
-        }
+        else
+            remoteDS.getNews(newsId).onEach { news ->
+                cacheMutex.withLock {
+                    cache.setNews(news, true)
+                }
+            }.flowOn(dispatcher)
     }
 }
