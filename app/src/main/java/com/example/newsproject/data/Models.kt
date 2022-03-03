@@ -51,12 +51,12 @@ data class NewsCache(
         return News()
     }
 
-    fun setNews(news: News, state: Boolean = false) {
+    fun setFullDes(newsId: Long, fullDes: String) {
         for (page in newsPageList)
             for (i in page.newsList.indices)
-                if (page.newsList[i].id == news.id) {
-                    news.state = state
-                    page.newsList[i].fullDescription = news.fullDescription
+                if (page.newsList[i].id == newsId) {
+                    page.newsList[i].state = true
+                    page.newsList[i].fullDescription = fullDes
                     return
                 }
     }

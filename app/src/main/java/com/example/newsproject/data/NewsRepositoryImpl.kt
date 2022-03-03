@@ -69,7 +69,7 @@ class NewsRepositoryImpl(
         else
             remoteDS.getNews(newsId).onEach { news ->
                 cacheMutex.withLock {
-                    cache.setNews(news, true)
+                    cache.setFullDes(news.id, news.fullDescription)
                 }
             }.flowOn(dispatcher)
     }

@@ -49,8 +49,9 @@ class NewsRemoteDataSourceImpl(
         Log.d(TAG, "retrofitService.getNews called with newsId = $newsId")
         return flow {
             retrofitService.getNews(newsId).also {
-                if (it.code == 0)
+                if (it.code == 0) {
                     emit(it.news)
+                }
                 else
                     throw Throwable(it.message)
             }
