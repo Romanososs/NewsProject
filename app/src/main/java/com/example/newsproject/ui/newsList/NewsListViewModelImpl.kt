@@ -23,10 +23,9 @@ class NewsListViewModelImpl(
 
     override val list: SnapshotStateList<News> = mutableStateListOf()
     override val state: MutableState<ScreenState> = mutableStateOf(ScreenState.IsLoading)
+    //if page == -1 => last page was loaded
+    override val page: MutableState<Int> = mutableStateOf(0)
     override var errorMessage: String = ""
-
-    //if nextPage == null -> last page loading returned empty list aka it's the last page
-    private var nextPage: Int? = 0
 
     init {
         Log.d(TAG, "was initialized")
@@ -37,15 +36,16 @@ class NewsListViewModelImpl(
     Load next page, viewModel page count will be increased by 1
      */
     override fun getNewPage() {
-        if (nextPage != null)
-            viewModelScope.launch {
+        viewModelScope.launch {
+            Log.d(TAG, "getNewPage was called with page ${page.value}")
+            if (page.value != -1)
                 try {
-                    repository.getNewsList(categoryId, nextPage!!).collect { listOfCurrentPage ->
-                        nextPage = if (listOfCurrentPage.isNotEmpty()) {
+                    repository.getNewsList(categoryId, page.value).collect { listOfCurrentPage ->
+                        page.value = if (listOfCurrentPage.isNotEmpty()) {
                             listOfCurrentPage.forEach { news -> list.add(news) }
-                            nextPage!! + 1
+                            page.value + 1
                         } else
-                            null
+                            -1
                         state.value = ScreenState.IsReady
                     }
                 } catch (t: Throwable) {
@@ -53,7 +53,7 @@ class NewsListViewModelImpl(
                     errorMessage = t.message ?: ""
                     state.value = ScreenState.IsFailed
                 }
-            }
+        }
     }
 
 }
